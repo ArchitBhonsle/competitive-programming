@@ -124,62 +124,48 @@ const ll LLMOD = 1e18 + 7;
 
 void init() {}
 
-class BIT {
-private:
-  vector<int> bit;
-
-public:
-  BIT(size_t size) : bit(size + 1) {}
-  auto update(size_t l, size_t r, int val = 1) {
-    bit[l] += val, bit[r + 1] -= val;
-  }
-  auto get(size_t i) {
-    int res = 0;
-    for (int j = 0; j <= i; j++)
-      res += bit[j];
-
-    return res;
-  }
-};
+int digit_sum(int num) {
+  int res = 0;
+  while (num > 0)
+    res += num % 10, num /= 10;
+  return res;
+}
 
 void solve(int testcase) {
-  size_t n, q;
+  int n, q;
   cin >> n >> q;
-  // deb(n, q);
   vector<int> a(n);
-  for (auto &ai : a)
-    cin >> ai;
-  // deb(a);
+  for (auto &x : a)
+    cin >> x;
 
-  BIT bit(n);
+  set<int> active;
+  for (auto i = 0; i < a.size(); ++i)
+    if (a[i] > 9)
+      active.insert(i);
 
   while (q--) {
-    string query;
-    cin >> query;
-
-    if (query == "1") {
-      size_t l, r;
+    int type;
+    cin >> type;
+    if (type == 1) {
+      int l, r;
       cin >> l >> r;
       --l, --r;
-      // deb(l, r);
-      bit.update(l, r);
+
+      vector<int> remove;
+      for (auto it = active.lower_bound(l); it != active.upper_bound(r); ++it) {
+        a[*it] = digit_sum(a[*it]);
+        if (a[*it] <= 9)
+          remove.push_back(*it);
+      }
+      for (const auto &r : remove)
+        active.erase(r);
+
     } else {
-      size_t x;
+      int x;
       cin >> x;
       --x;
-      auto nUpdates = bit.get(x);
-      // deb(x, a[x], nUpdates);
 
-      auto num = a[x], temp = 0;
-      while (nUpdates--) {
-        while (num > 0)
-          temp += num % 10, num /= 10;
-
-        num = temp, temp = 0;
-      }
-      cout << num << endl;
-      a[x] = num;
-      bit.update(x, x, -bit.get(x));
+      cout << a[x] << endl;
     }
   }
 }

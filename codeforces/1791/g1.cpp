@@ -1,6 +1,7 @@
 // Template {{{
 
 #include <bits/stdc++.h>
+#include <queue>
 
 using namespace std;
 
@@ -125,23 +126,29 @@ const ll LLMOD = 1e18 + 7;
 void init() {}
 
 void solve(int testcase) {
-  size_t n;
-  cin >> n;
+  int n, c;
+  cin >> n >> c;
   vector<int> a(n);
   for (auto &x : a)
     cin >> x;
 
-  sort(a.begin(), a.end());
-  auto nNegs = distance(a.begin(), upper_bound(a.begin(), a.end(), 0));
+  priority_queue<int, vector<int>, greater<int>> pq;
+  for (auto i = 0u; i < n; ++i) {
+    pq.push(a[i] + i + 1);
+  }
 
-  transform(a.begin(), a.end(), a.begin(),
-            [](auto &x) { return x < 0 ? -x : x; });
-  sort(a.begin(), a.end());
+  auto res = 0u;
+  while (!pq.empty()) {
+    auto curr = pq.top();
+    pq.pop();
 
-  if (nNegs % 2 == 1)
-    a.front() = -a.front();
+    if (curr > c)
+      break;
 
-  cout << accumulate(a.begin(), a.end(), 0ll) << endl;
+    ++res, c -= curr;
+  }
+
+  cout << res << endl;
 }
 
 // Main {{{
